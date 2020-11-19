@@ -14,6 +14,15 @@ func CreateRequest(method string, url string, body []byte) ([]byte, error) {
 }
 
 func CreateRequestWithCustomHeaders(method string, url string, body []byte, extraHeaders map[string]string) ([]byte, error) {
+	err := ValidateToken()
+
+	if err != nil {
+		err = RefreshToken()
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	request, err := http.NewRequest(method, url, bytes.NewBuffer(body))
 
 	if err != nil {
@@ -33,10 +42,6 @@ func CreateRequestWithCustomHeaders(method string, url string, body []byte, extr
 	}
 
 	response, err := client.Do(request)
-
-	if response.StatusCode == 401 {
-		RefreshToken()
-	}
 
 	if response.StatusCode != 200 {
 		return nil, errors.New(response.Status)

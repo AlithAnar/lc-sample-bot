@@ -112,7 +112,7 @@ func handleIncomingMessageEvent(payload common.WebhookChatEventPayload) error {
 func sendMessageToCustomer(chatId string, messageText string) error {
 	botConfig := NewBotConfig()
 
-	log.Printf("[BOT] Sending message to ChatID: %s as Bot:", chatId, botConfig)
+	log.Printf("[BOT] Sending message to ChatID: %s as Bot:", chatId, botConfig.BotAgentId)
 
 	body, err := json.Marshal(common.ChatEventPayload{
 		ChatId: chatId,

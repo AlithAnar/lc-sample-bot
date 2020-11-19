@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"lc-sample-bot/config"
 	"log"
@@ -51,6 +52,37 @@ func ExchangeToken(code string) error {
 	return nil
 }
 
+func ValidateToken() error {
+	tokenStorage := NewTokenStorage()
+	request, err := http.NewRequest(http.MethodGet, "https://accounts.labs.livechat.com/v2/info", nil)
+
+	request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", tokenStorage.GetAccessToken()))
+
+	client := &http.Client{}
+	response, err := client.Do(request)
+
+	if err != nil {
+		return err
+	}
+
+	if response.StatusCode == 422 || response.StatusCode == 401 {
+		return errors.New("Invalid token")
+	}
+
+	rawbody, err := ioutil.ReadAll(response.Body)
+
+	log.Print(string(rawbody))
+
+	var payload AuthorizePayload
+	err = json.Unmarshal(rawbody, &payload)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func RefreshToken() error {
 	config := config.NewAppConfig()
 	tokenStorage := NewTokenStorage()
@@ -66,7 +98,7 @@ func RefreshToken() error {
 		return err
 	}
 
-	res, err := http.NewRequest(http.MethodPost, "https://accounts.labs.livechat.com/v2/token", bytes.NewBuffer(requestBody))
+	res, err := http.Post("https://accounts.labs.livechat.com/v2/token", "application/json", bytes.NewBuffer(requestBody))
 
 	defer res.Body.Close()
 
