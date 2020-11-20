@@ -33,14 +33,18 @@ func ExchangeToken(code string) error {
 		return err
 	}
 
-	response, err := CreateRequest(http.MethodPost, "https://accounts.labs.livechat.com/token", requestBody)
+	response, err := http.Post("https://accounts.labs.livechat.com/token", "application/json", bytes.NewBuffer(requestBody))
+
+	defer response.Body.Close()
 
 	if err != nil {
 		return err
 	}
 
+	rawbody, err := ioutil.ReadAll(response.Body)
+
 	var payload AuthorizePayload
-	err = json.Unmarshal(response, &payload)
+	err = json.Unmarshal(rawbody, &payload)
 
 	if err != nil {
 		return err
