@@ -6,9 +6,13 @@ import (
 	"lc-sample-bot/utils"
 	"log"
 	"net/http"
+	"sync"
 )
 
-var botChatActivity = make(map[string]int)
+var botChatActivity = BotChatActivity{
+	RWMutex: sync.RWMutex{},
+	items:   make(map[string]int),
+}
 
 func RegisterBot(webhookUrl string, botSecret string) error {
 	body, err := json.Marshal(BotPayload{
@@ -91,7 +95,7 @@ func handleIncomingMessageEvent(payload common.WebhookChatEventPayload) error {
 	}
 	log.Printf("[BOT] Handling incoming chat event. ChatID: %s Type: %s", payload.ChatId, payload.Event.Type)
 
-	currentChatActivity := botChatActivity[payload.ChatId]
+	currentChatActivity := botChatActivity.GetChatActivity(payload.ChatId)
 
 	var err error
 
@@ -104,7 +108,8 @@ func handleIncomingMessageEvent(payload common.WebhookChatEventPayload) error {
 		err = sendMessageToCustomer(payload.ChatId, "I don't want to talk with you anymore ;/")
 	default:
 	}
-	botChatActivity[payload.ChatId] += 1
+
+	botChatActivity.IncrementChatActivity(payload.ChatId)
 
 	return err
 }
