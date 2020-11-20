@@ -9,6 +9,7 @@ import (
 	"lc-sample-bot/config"
 	"log"
 	"net/http"
+	"time"
 )
 
 type AuthorizePayload struct {
@@ -62,7 +63,9 @@ func ValidateToken() error {
 
 	request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", tokenStorage.GetAccessToken()))
 
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: 15 * time.Second,
+	}
 	response, err := client.Do(request)
 
 	if err != nil {

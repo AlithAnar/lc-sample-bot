@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 )
 
 func CreateRequest(method string, url string, body []byte) ([]byte, error) {
@@ -30,7 +31,9 @@ func CreateRequestWithCustomHeaders(method string, url string, body []byte, extr
 	}
 
 	tokenStorage := NewTokenStorage()
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: 15 * time.Second,
+	}
 
 	request.Header.Add("Content-Type", "application/json")
 	request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", tokenStorage.GetAccessToken()))
