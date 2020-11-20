@@ -108,6 +108,10 @@ func RefreshToken() error {
 
 	rawbody, err := ioutil.ReadAll(res.Body)
 
+	if err != nil {
+		return err
+	}
+
 	log.Print(string(rawbody))
 
 	var payload AuthorizePayload
