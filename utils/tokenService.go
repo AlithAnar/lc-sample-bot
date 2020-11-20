@@ -12,11 +12,11 @@ import (
 )
 
 type AuthorizePayload struct {
-	AccessToken  string `json:"access_token,omitempty"`
-	ExpiresIn    int    `json:"expires_in,omitempty"`
-	LicenceId    int    `json:"licence_id,omitempty"`
-	RefreshToken string `json:"refresh_token,omitempty"`
-	TokenType    string `json:"token_type,omitempty"`
+	AccessToken  string `json:"access_token"`
+	ExpiresIn    int    `json:"expires_in"`
+	LicenceId    int    `json:"licence_id"`
+	RefreshToken string `json:"refresh_token"`
+	TokenType    string `json:"token_type"`
 }
 
 func ExchangeToken(code string) error {
